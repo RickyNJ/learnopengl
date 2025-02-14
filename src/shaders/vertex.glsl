@@ -7,11 +7,16 @@ layout (location = 1) in vec2 aTexCoord;
 // out vec3 ourColor; // specify a colour output to the fragment shader
 out vec2 texCoord;
 
-uniform mat4 transform;
+// uniform mat4 transform;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 
 void main() {
-		gl_Position = transform * vec4(aPos, 1.0);
-		texCoord = vec2(aTexCoord.x, aTexCoord.y);
-		// ourColor = aColor;
-		// texCoord = aTexCoord;
+	// gl_Position = transform * vec4(aPos, 1.0);
+	gl_Position = projection * view* model * vec4(aPos, 1.0);
+	texCoord = vec2(aTexCoord.x, aTexCoord.y);
+	// ourColor = aColor;
+	// texCoord = aTexCoord;
 }

@@ -1,5 +1,6 @@
 #include "../include/shader.h"
 
+
 #include "../include/glad/glad.h"
 #include "../include/glm/glm.hpp"
 #include "../include/glm/gtc/matrix_transform.hpp"
@@ -46,15 +47,15 @@ int main() {
   Shader myShader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
 
   float vertices[] = {
-      // positions          // colors           // texture coords
-      0.5f,  0.5f,  0.0f, 1.0f, 1.0f, // top right
-      0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-      -0.5f, 0.5f,  0.0f, 0.0f, 1.0f  // top left
+    // positions          // colors           // texture coords
+    0.5f,  0.5f,  0.0f, 1.0f, 1.0f, // top right
+    0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
+    -0.5f, 0.5f,  0.0f, 0.0f, 1.0f  // top left
   };
   unsigned int indices[] = {
-      0, 1, 3, // first triangle
-      1, 2, 3  // second triangle
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
   };
 
   unsigned int VAO, VBO, EBO;
@@ -97,7 +98,7 @@ int main() {
 
   int width, height, nrChannels;
   unsigned char *data =
-      stbi_load("resources/container.jpg", &width, &height, &nrChannels, 0);
+    stbi_load("resources/container.jpg", &width, &height, &nrChannels, 0);
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, data);
@@ -118,7 +119,7 @@ int main() {
 
   stbi_set_flip_vertically_on_load(true);
   data =
-      stbi_load("resources/awesomeface.png", &width, &height, &nrChannels, 0);
+    stbi_load("resources/awesomeface.png", &width, &height, &nrChannels, 0);
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data);
@@ -128,6 +129,7 @@ int main() {
     std::cout << "Failed to load texture" << std::endl;
   }
   stbi_image_free(data);
+
 
   myShader.use();
   myShader.setInt("texture1", 0);
@@ -147,15 +149,33 @@ int main() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    glm::mat trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-    trans = glm::rotate(trans,  (float)glfwGetTime(),glm::vec3(0.0, 0.0, 1.0));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    unsigned int modelLoc = glGetUniformLocation(myShader.ID, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    unsigned int viewLoc = glGetUniformLocation(myShader.ID, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    unsigned int projectionLoc = glGetUniformLocation(myShader.ID, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    /*glm::mat trans = glm::mat4(1.0f);*/
+    /*trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));*/
+    /*trans = glm::rotate(trans,  (float)glfwGetTime(),glm::vec3(0.0, 0.0, 1.0));*/
     /*trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));*/
 
     myShader.use();
 
-    unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    /*unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");*/
+    /*glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
